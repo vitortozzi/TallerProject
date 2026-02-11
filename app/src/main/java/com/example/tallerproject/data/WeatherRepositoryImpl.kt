@@ -3,30 +3,32 @@ package com.example.tallerproject.data
 import com.example.tallerproject.domain.WeatherData
 import com.example.tallerproject.domain.WeatherRepository
 import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 
 class WeatherRepositoryImpl : WeatherRepository {
 
     val apiService = Retrofit.Builder()
-        .baseUrl("https://api.openweathermap.org/")
+        .baseUrl("https://geocoding-api.open-meteo.com/v1/")
+        .addConverterFactory(GsonConverterFactory.create())
         .build()
         .create(ApiService::class.java)
 
 
-    override suspend fun fecthWeatherData(cityName: String): WeatherData {
+    override suspend fun fetchWeatherData(cityName: String): WeatherData {
 
         val response = apiService.getLocationByCity(cityName)
 
-        if (response.isEmpty()) {
-            throw Exception("No weather data found")
+        if (response.results.isEmpty()) {
+            throw Exception("No weather data found for city: $cityName")
         }
 
-        val location = response.first()
+        val location = response.results.first()
 
-        val weatherResponse = apiService.getWeatherByLocation(location.lat, location.lon)
+        val weatherResponse = apiService.getWeatherByLocation(location.latitude.toString(), location.longitude.toString())
 
         return WeatherData(
             cityName = cityName,
-            temperature = weatherResponse.temperature,
+            temperature = weatherResponse.currentWeatherResponse.temperature.toString(),
             description = null
         )
     }

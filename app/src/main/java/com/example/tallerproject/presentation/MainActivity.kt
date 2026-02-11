@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -52,7 +51,7 @@ fun WeatherScreen(
         modifier = modifier.padding(16.dp)
     ) {
         WeatherSearch(
-            onClickSearch = viewModel::fetchWeatherData
+            onSearch = viewModel::fetchWeatherData
         )
         WeatherInfo(
             uiState = uiState
@@ -63,7 +62,7 @@ fun WeatherScreen(
 @Composable
 fun WeatherSearch(
     modifier: Modifier = Modifier,
-    onClickSearch: (String) -> Unit
+    onSearch: (String) -> Unit
 ) {
     var typedText by remember { mutableStateOf("") }
     Column(modifier = modifier) {
@@ -74,15 +73,9 @@ fun WeatherSearch(
             value = typedText,
             onValueChange = { text ->
                 typedText = text
+                onSearch(text)
             }
         )
-        Button(
-            onClick = {
-                onClickSearch(typedText)
-            }
-        ) {
-            Text("Search")
-        }
     }
 }
 
@@ -134,7 +127,7 @@ fun WeatherInfo(
 @Composable
 fun WeatherSearchPreview() {
     TallerProjectTheme {
-        WeatherSearch(onClickSearch = {})
+        WeatherSearch(onSearch = {})
     }
 }
 
